@@ -19,7 +19,21 @@ hr {
 	margin-right: 30px;
 }
 
+label {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	font-size: 18px;
+}
+
 .hidden {
+	display: none;
+	visibility: hidden;
+}
+
+.initial-hidden {
 	display: none;
 	visibility: hidden;
 }
@@ -74,11 +88,24 @@ hr {
 	display: none;
 }
 
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 75px;
+	height: 35px;
+}
+
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
 #headshot-container {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-	margin-top: 50px;
+	margin-top: 30px;
 }
 
 #game-container {
@@ -88,6 +115,7 @@ hr {
 }
 
 #target-header {
+	margin-top: 45px;
 	margin-left: 75px;
 	text-align: left;
 	display: inline;
@@ -114,6 +142,10 @@ hr {
 #wrong-text {
 	margin: 5px;
 	color: rgb(100, 0, 0);
+}
+
+#game-controls {
+	margin-left: 75px;
 }
 
 

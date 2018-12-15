@@ -5,8 +5,54 @@ var GameCreator = (people) => {
 	let numWrong = 0;
 	let inputDisabled = false;
 
+	let fallback = null;
+
+	let matpeople = null;
+
+	let mode = 'standard';
+
+	let clicked = [false, false, false, false, false];
+
 	let start = () => {
-		$("#scoring").removeClass('hidden');
+		$(".initial-hidden").removeClass('initial-hidden');
+		// $("#scoring").removeClass('hidden');
+
+		fallback = people.filter((person) => person.firstName === 'WillowTree')[0];
+		matpeople = people.filter((person) => person.firstName.startsWith('Mat'));
+
+		$('#btn-game-standard').on('click', (event) => {
+			event.preventDefault();
+
+			if (mode !== 'standard') {
+				mode = 'standard';
+				$('#btn-game-mat').removeClass('btn-primary');
+				$('#btn-game-mat').addClass('btn-secondary');
+
+				$('btn-game-standard').removeClass('btn-secondary');
+				$('btn-game-standard').addClass('btn-primary');
+
+				resetScore();
+				newRound();
+			}
+		});
+
+		$('#btn-game-mat').on('click', (event) => {
+			event.preventDefault();
+
+			if (mode !== 'mat') {
+				mode = 'mat';
+
+				$('#btn-game-standard').removeClass('btn-primary');
+				$('#btn-game-standard').addClass('btn-secondary');
+
+				$('#btn-game-mat').removeClass('btn-secondary');
+				$('#btn-game-mat').addClass('btn-primary');
+
+				resetScore();
+				newRound();
+			}
+		});
+
 		newRound();
 	};
 
@@ -14,7 +60,7 @@ var GameCreator = (people) => {
 		return person.firstName + ' ' + person.lastName;
 	};
 
-	let appendHeadshot = (parent, person, fallback, isTarget) => {
+	let appendHeadshot = (parent, person, fallback, isTarget, position) => {
 		let hsInfo = person.headshot;
 		let oHeight = hsInfo.height;
 		let oWidth = hsInfo.width;
@@ -67,8 +113,16 @@ var GameCreator = (people) => {
 		$(wrapper).append(overlay);
 		$(wrapper).append(img);
 
-		$(wrapper).on('click', () => {
+		$(wrapper).data('position', position);
+
+		$(wrapper).on('click', (event) => {
+			event.preventDefault();
+			event.stopPropagation();
+
 			if (inputDisabled) { return; }
+			if (clicked[$(wrapper).data('position')]) { return; }
+
+			clicked[$(wrapper).data('position')] = true;
 
 			$(overlay).removeClass('shrunk');
 
@@ -110,18 +164,28 @@ var GameCreator = (people) => {
 		// let parent = $('#headshot-container');
 		// parent.empty();
 
-		let fallback = people.filter((person) => person.firstName === 'WillowTree')[0];
+		// let fallback = people.filter((person) => person.firstName === 'WillowTree')[0];
 
-		let chosen = people.slice().sort(() => 0.5 - Math.random()).slice(0, numHeadshots);
+		let fullgroup = (mode === 'mat') ? matpeople : people;
+
+		let chosen = fullgroup.slice().sort(() => 0.5 - Math.random()).slice(0, numHeadshots);
 		let names = [];
 
 		let target = buildName(chosen[Math.floor(Math.random() * chosen.length)]);
 
-		for (let person of chosen) {
-			names.push(appendHeadshot(parent, person, fallback, buildName(person) === target));
+		for (let i = 0; i < chosen.length; i++) {
+			let person = chosen[i];
+
+			names.push(appendHeadshot(parent, person, fallback, buildName(person) === target, i));
 		}
 
 		return target;
+	};
+
+	let resetScore = () => {
+		numCorrect = 0;
+		numWrong = 0;
+		writeScore();
 	};
 
 	let newRound = () => {
@@ -130,7 +194,10 @@ var GameCreator = (people) => {
 
 		let target = generateRandomHeadshots(parent, 5);
 
+		target = (mode === 'mat') ? 'Mat(' + target.slice(3) + ')' : target;
+
 		$("#target-header").text('Find ' + target);
+		clicked = [false, false, false, false, false];
 		inputDisabled = false;
 	};
 
