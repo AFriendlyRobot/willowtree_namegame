@@ -13,7 +13,7 @@ var GameCreator = (people) => {
 
 	let clicked = [false, false, false, false, false];
 
-	let secondsLeft = 60;
+	let secondsLeft = 10;
 	let timerInterval = null;
 
 	let highlightButton = (id) => {
@@ -188,6 +188,7 @@ var GameCreator = (people) => {
 		if (mode === 'time') {
 			flashTimer(true);
 			secondsLeft += 2;
+			drawTimer();
 		}
 
 		setTimeout(() => newRound(), 1000);
@@ -200,6 +201,7 @@ var GameCreator = (people) => {
 		if (mode === 'time') {
 			flashTimer(false);
 			secondsLeft -= 2;
+			drawTimer();
 		}
 	};
 
@@ -234,28 +236,45 @@ var GameCreator = (people) => {
 	};
 
 	let startTimer = () => {
-		secondsLeft = 60;
+		secondsLeft = 10;
 
 		$('#timer-text').removeClass('hidden');
 		drawTimer();
 
-		setInterval(() => {
+		timerInterval = setInterval(() => {
 			secondsLeft -= 1;
 			drawTimer();
 
-			if (secondsLeft === 0) {
-				clearTimer();
-				inputDisabled = true;
-				$('#target-header').text('Finished!');
+			if (secondsLeft <= 0) {
+				// clearTimer();
+				// inputDisabled = true;
+				// $('#target-header').text('Finished!');
+				endTimedSession();
 			}
 		}, 1000);
 	};
 
-	let drawTimer = () => {
-		let secs = secondsLeft % 60;
-		let mins = Math.floor(secondsLeft / 60);
+	let endTimedSession = () => {
+		if (secondsLeft <= 0) {
+			clearTimer();
+			inputDisabled = true;
+			$('#target-header').text('Finished!');
+		}
+	}
 
-		$('#timer-text').text(`${mins}:${secs > 9 ? secs : '0' + secs}`);
+	let drawTimer = () => {
+		if (secondsLeft <= 0) {
+			endTimedSession();
+		}
+
+		let secs = Math.max(secondsLeft % 60, 0);
+		let mins = Math.max(Math.floor(secondsLeft / 60), 0);
+
+		if (secondsLeft > 0) {
+			$('#timer-text').text(`${mins}:${secs > 9 ? secs : '0' + secs}`);
+		} else {
+			$('#timer-text').text('0:00');
+		}
 	};
 
 	let generateRandomHeadshots = (parent, numHeadshots) => {
