@@ -13,23 +13,36 @@ var GameCreator = (people) => {
 
 	let clicked = [false, false, false, false, false];
 
+	let secondsLeft = 60;
+	let timerInterval = null;
+
+	let highlightButton = (id) => {
+		$(id).addClass('btn-primary');
+		$(id).removeClass('btn-secondary');
+	}
+
+	let unhighlightButton = (id) => {
+		$(id).addClass('btn-secondary');
+		$(id).removeClass('btn-primary');
+	}
+
 	let start = () => {
 		$(".initial-hidden").removeClass('initial-hidden');
 		// $("#scoring").removeClass('hidden');
 
 		fallback = people.filter((person) => person.firstName === 'WillowTree')[0];
 		matpeople = people.filter((person) => person.firstName.startsWith('Mat'));
+		mpeople = people.filter((person) => person.firstName.startsWith('M'));
 
 		$('#btn-game-standard').on('click', (event) => {
 			event.preventDefault();
 
 			if (mode !== 'standard') {
 				mode = 'standard';
-				$('#btn-game-mat').removeClass('btn-primary');
-				$('#btn-game-mat').addClass('btn-secondary');
-
-				$('#btn-game-standard').removeClass('btn-secondary');
-				$('#btn-game-standard').addClass('btn-primary');
+				highlightButton('#btn-game-standard');
+				unhighlightButton('#btn-game-mat');
+				unhighlightButton('#btn-game-m');
+				unhighlightButton('#btn-game-time');
 
 				resetScore();
 				newRound();
@@ -41,12 +54,40 @@ var GameCreator = (people) => {
 
 			if (mode !== 'mat') {
 				mode = 'mat';
+				highlightButton('#btn-game-mat');
+				unhighlightButton('#btn-game-standard');
+				unhighlightButton('#btn-game-m');
+				unhighlightButton('#btn-game-time');
 
-				$('#btn-game-standard').removeClass('btn-primary');
-				$('#btn-game-standard').addClass('btn-secondary');
+				resetScore();
+				newRound();
+			}
+		});
 
-				$('#btn-game-mat').removeClass('btn-secondary');
-				$('#btn-game-mat').addClass('btn-primary');
+		$('#btn-game-m').on('click', (event) => {
+			event.preventDefault();
+
+			if (mode !== 'm') {
+				mode = 'm';
+				highlightButton('#btn-game-m');
+				unhighlightButton('#btn-game-standard');
+				unhighlightButton('#btn-game-mat');
+				unhighlightButton('#btn-game-time');
+
+				resetScore();
+				newRound();
+			}
+		});
+
+		$('#btn-game-time').on('click', (event) => {
+			event.preventDefault();
+
+			if (mode !== 'time') {
+				mode = 'time';
+				highlightButton('#btn-game-time');
+				unhighlightButton('#btn-game-standard');
+				unhighlightButton('#btn-game-m');
+				unhighlightButton('#btn-game-mat');
 
 				resetScore();
 				newRound();
@@ -144,20 +185,77 @@ var GameCreator = (people) => {
 
 		$("#target-header").text("Great job!");
 
+		if (mode === 'time') {
+			flashTimer(true);
+			secondsLeft += 2;
+		}
+
 		setTimeout(() => newRound(), 1000);
-	}
+	};
 
 	let incorrectClicked = () => {
 		numWrong += 1;
 		writeScore();
-	}
+
+		if (mode === 'time') {
+			flashTimer(false);
+			secondsLeft -= 2;
+		}
+	};
+
+	let flashTimer = (wasCorrect) => {
+		$('#timer-text').addClass((wasCorrect) ? 'timer-correct' : 'timer-incorrect');
+		
+		setTimeout(() => {
+			$('#timer-text').removeClass('timer-correct');
+			$('#timer-text').removeClass('timer-incorrect');
+		}, 500);
+	};
 
 	let writeScore = () => {
-		let correctText = $('#correct-text');
-		correctText.text(`Correct: ${numCorrect}`);
+		if (mode === 'time') {
+			let correctText = $('#correct-text');
+			correctText.text(`Correct: ${numCorrect}`);
 
-		let wrongText = $('#wrong-text');
-		wrongText.text(`Incorrect: ${numWrong}`);
+			$('#wrong-text').addClass('hidden');
+		} else {
+			let correctText = $('#correct-text');
+			correctText.text(`Correct: ${numCorrect}`);
+
+			let wrongText = $('#wrong-text');
+			$('#wrong-text').removeClass('hidden');
+			wrongText.text(`Incorrect: ${numWrong}`);
+		}
+	};
+
+	let clearTimer = () => {
+		$('#timer-text').addClass('hidden');
+		clearInterval(timerInterval);
+	};
+
+	let startTimer = () => {
+		secondsLeft = 60;
+
+		$('#timer-text').removeClass('hidden');
+		drawTimer();
+
+		setInterval(() => {
+			secondsLeft -= 1;
+			drawTimer();
+
+			if (secondsLeft === 0) {
+				clearTimer();
+				inputDisabled = true;
+				$('#target-header').text('Finished!');
+			}
+		}, 1000);
+	};
+
+	let drawTimer = () => {
+		let secs = secondsLeft % 60;
+		let mins = Math.floor(secondsLeft / 60);
+
+		$('#timer-text').text(`${mins}:${secs > 9 ? secs : '0' + secs}`);
 	};
 
 	let generateRandomHeadshots = (parent, numHeadshots) => {
@@ -166,7 +264,16 @@ var GameCreator = (people) => {
 
 		// let fallback = people.filter((person) => person.firstName === 'WillowTree')[0];
 
-		let fullgroup = (mode === 'mat') ? matpeople : people;
+		// let fullgroup = (mode === 'mat') ? matpeople : people;
+		let fullgruop;
+
+		if (mode === 'mat') {
+			fullgroup = matpeople;
+		} else if (mode === 'm') {
+			fullgroup = mpeople;
+		} else {
+			fullgroup = people;
+		}
 
 		let chosen = fullgroup.slice().sort(() => 0.5 - Math.random()).slice(0, numHeadshots);
 		let names = [];
@@ -186,6 +293,12 @@ var GameCreator = (people) => {
 		numCorrect = 0;
 		numWrong = 0;
 		writeScore();
+
+		clearTimer();
+
+		if (mode === 'time') {
+			startTimer();
+		}
 	};
 
 	let newRound = () => {
@@ -194,7 +307,13 @@ var GameCreator = (people) => {
 
 		let target = generateRandomHeadshots(parent, 5);
 
-		target = (mode === 'mat') ? 'Mat(' + target.slice(3) + ')' : target;
+		// target = (mode === 'mat') ? 'Mat(' + target.slice(3) + ')' : target;
+
+		if (mode === 'mat') {
+			target = 'Mat(' + target.slice(3) + ')';
+		} else if (mode === 'm') {
+			target = 'M(' + target.slice(1) + ')';
+		}
 
 		$("#target-header").text('Find ' + target);
 		clicked = [false, false, false, false, false];

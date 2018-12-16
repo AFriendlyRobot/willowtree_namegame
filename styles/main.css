@@ -148,5 +148,22 @@ label {
 	margin-left: 75px;
 }
 
+#timer-text {
+	float: right;
+	margin-right: 110px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 28px;
+}
+
+.timer-correct {
+	color: darkgreen;
+}
+
+.timer-incorrect {
+	color: darkred;
+	transition: out 0.5s;
+}
+
 
 
