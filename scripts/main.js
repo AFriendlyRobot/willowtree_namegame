@@ -28,8 +28,8 @@ var GameCreator = (people) => {
 				$('#btn-game-mat').removeClass('btn-primary');
 				$('#btn-game-mat').addClass('btn-secondary');
 
-				$('btn-game-standard').removeClass('btn-secondary');
-				$('btn-game-standard').addClass('btn-primary');
+				$('#btn-game-standard').removeClass('btn-secondary');
+				$('#btn-game-standard').addClass('btn-primary');
 
 				resetScore();
 				newRound();
