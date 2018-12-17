@@ -1,4 +1,4 @@
-# willowtree_namegame
+# WillowTree Name Game
 
 This is a simple implementation of the name game.
 To run, use `http-server .`.
