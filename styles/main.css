@@ -165,5 +165,38 @@ label {
 	transition: out 0.5s;
 }
 
+@media only screen and (min-width: 1000px) {
+	.wide-hidden {
+		display: none;
+		visibility: hidden;
+	}
+}
 
+@media only screen and (max-width: 1000px) {
+	body {
+		text-align: center;
+	}
+
+	#scoring {
+		float: none;
+		text-align: center;
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	#target-header {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	#timer-text {
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	#headshot-container {
+		max-width: 525px;
+	}
+}
 
