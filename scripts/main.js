@@ -68,24 +68,6 @@ var GameCreator = (people) => {
 	// * Wrapper div (including border on hover)
 	let appendHeadshot = (parent, person, fallback, isTarget, position) => {
 		let hsInfo = person.headshot;
-		let oHeight = hsInfo.height;
-		let oWidth = hsInfo.width;
-		let hgt, wdt, topMargin;
-
-		// Calculate scale factor needed to fit into a 170 x 170 box
-		if (!oHeight || !oWidth || (oHeight === oWidth)) {
-			hgt = HEADSHOT_SIZE;
-			wdt = HEADSHOT_SIZE;
-		} else if (oHeight > oWidth) {
-			let factor = HEADSHOT_SIZE / oHeight;
-			hgt = oHeight * factor;
-			wdt = oWidth * factor;
-		} else if (oHeight < oWidth) {
-			let factor = HEADSHOT_SIZE / oWidth;
-			hgt = oHeight * factor;
-			wdt = oWidth * factor;
-			topMargin = (HEADSHOT_SIZE - hgt) / 2;
-		}
 
 		// Either use fallback or provided person object to generate personal + img information
 		let src = hsInfo.url || fallback.headshot.url;
@@ -101,16 +83,7 @@ var GameCreator = (people) => {
 		let imgStr = '<img class="namegame-headshot" src="' + src + '"';
 		imgStr += 'alt="' + alt + '"';
 		imgStr += 'id="' + id + '"';
-		imgStr += 'height="' + hgt + '"';
-		imgStr += 'width="' + wdt + '"';
 		imgStr += 'data="' + data + '"';
-
-		// If the original image is wider than it is tall,
-		//     add a manual offset to vertically center it
-		if (topMargin) {
-			imgStr += 'style="margin-top:' + topMargin + 'px"';
-		}
-
 		imgStr += '>';
 
 		// Create wrapper div
