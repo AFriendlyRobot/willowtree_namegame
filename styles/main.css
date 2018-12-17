@@ -200,3 +200,21 @@ label {
 	}
 }
 
+@media only screen and (min-width: 600px) {
+	.mid-hidden {
+		display: none;
+		visibility: hidden;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	#game-controls {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	#game-controls button {
+		margin-top: 5px;
+	}
+}
+
